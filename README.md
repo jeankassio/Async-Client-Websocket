@@ -3,6 +3,12 @@ Async Client Websocket is an asynchronous Websocket Client built with the aim of
 
 Simple to use and has only the "send" and "disconnect" functions as synchronous.
 
+## Access file
+
+Import the AsyncClientWebSocket.js file to your server, or use the CDN:
+
+https://cdn.jsdelivr.net/gh/jeankassio/Async-Client-Websocket@main/src/AsyncClientWebSocket.js
+
 ## How to use
 
 ```javascript
