@@ -14,44 +14,57 @@ https://cdn.jsdelivr.net/gh/jeankassio/Async-Client-Websocket@main/src/AsyncClie
 ```javascript
 const Server = new WebSocketClient('wss://your_wss.com');
 
+//Methods:
+Server.connect(timeout = 5000);
+Server.send(message);
+Server.disconnect();
+Server.destroy();
+Server.isConnected();
+Server.saveQueueOnLocalStorage(status);
+Server.startKeepAlive(interval = 15000, ping); //"ping" is the word that your server will receive as a ping if you use a word other than "ping"
+Server.stopKeepAlive();
+Server.trackLatency(ping, pong, interval = 10000); //"ping" and "pong" is the word that your server will receive as a ping if you use a word other than "ping"/"pong"
+Server.untrackLatency();
+Server.getLatency();
+Server.autoReconnect(interval = 3000, maxAttemps = infinity, callback = null);
+Server.preventSpam(interval = 100); //"interval" is the minimum time allowed between one message and another message
+Server.allowSpam();
+Server.verbose(status = true);
+Server.setOutgoingMiddleware(fn);
+Server.setIncomingMiddleware(fn);
+
+
+//Events
 Server.onOpen = (event) => {
-		
-  /*
-    Your actions on opening
-  */
 		
 };
 
 Server.onClose = (event) => {
-		
-  /*
-    Your actions on opening
-    Connect again is an example
-  */
-    
-  wsConnect();
-		
+  		
 };
 
 Server.onMessage = (message) => {
-		
-  /*
-    Your actions on opening
-    FilterMessage is an example
-  */
-  
-  filterMessage(message);
 		
 };
 
 Server.onError = (error) => {
 		
-		/*
-    Your actions on Error
-    */
-		
 };
+
+
+Server.onSpam = (message) => {
 	
+};
+
+Server.onVerbose = (verboseMessage) => {
+
+};
+
+Server.onLatency = (latency) => {
+
+};
+
+
 function wsSend(message) {
   Server.send(message);
 }
@@ -62,15 +75,7 @@ function wsClose() {
 	
 async function wsConnect(){
 	 
-  try{
-    
-    await Server.connect();
-		
-  }catch(error){
-		
-    console.error('Error while connecting WebSocket:', error);
-		
-  }
+  await Server.connect();
 		
 }
 ```
