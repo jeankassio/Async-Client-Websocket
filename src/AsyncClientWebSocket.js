@@ -341,7 +341,7 @@ class WebSocketClient{
 		this.spamTime = interval;
 	}
 	
-	verbose(status = true){
+	log(status = true){
 		this.verbose = status;
 	}
 	
