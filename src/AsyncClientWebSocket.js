@@ -25,7 +25,7 @@ class WebSocketClient{
 		this.onSpam = null;
 		this.onVerbose = null;
 		this.onLatency = null;
-		this.autoReconnect = false;
+		this._autoReconnect = false;
 		this.reconnectAttemps = 0;
 		this.messageQueue = [];
 		this.keepAliveInterval = null;
@@ -196,7 +196,7 @@ class WebSocketClient{
 	
 	destroy(){
 		
-		this.autoReconnect = false;
+		this._autoReconnect = false;
 		this.disconnect();
 		this.stopKeepAlive();
 		this.socket = null;
@@ -324,7 +324,7 @@ class WebSocketClient{
 	
 	autoReconnect(interval = 3000, maxAttemps = infinity, callback = null){
 		
-		this.autoReconnect = true;
+		this._autoReconnect = true;
 		this.reconnectInterval = interval;
 		this.maxReconnectAttemps = maxAttemps;
 		this.reconnectCallback = callback;
@@ -371,7 +371,7 @@ class WebSocketClient{
 	
 	_attemptReconnect(){
 		
-		if(!this.autoReconnect || this.reconnectAttemps >= this.maxReconnectAttemps){
+		if(!this._autoReconnect || this.reconnectAttemps >= this.maxReconnectAttemps){
 			return;
 		}
 		
