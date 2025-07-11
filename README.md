@@ -27,7 +27,7 @@ Server.getLatency();
 Server.autoReconnect(interval = 3000, maxAttemps = infinity, callback = null);
 Server.preventSpam(interval = 100); //"interval" is the minimum time allowed between one message and another message
 Server.allowSpam();
-Server.verbose(status = true);
+Server.log(status = true);
 Server.setOutgoingMiddleware(fn);
 Server.setIncomingMiddleware(fn);
 
