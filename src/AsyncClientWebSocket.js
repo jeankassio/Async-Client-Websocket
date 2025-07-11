@@ -322,7 +322,7 @@ class WebSocketClient{
 		
 	}
 	
-	autoReconnect(interval = 3000, maxAttemps = infinity, callback = null){
+	autoReconnect(interval = 3000, maxAttemps = Infinity, callback = null){
 		
 		this._autoReconnect = true;
 		this.reconnectInterval = interval;
