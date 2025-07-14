@@ -1,5 +1,5 @@
 /*!
- * Async Client Websocket v1.2.5
+ * Async Client Websocket v1.2.8
  * by Jean Kássio
  *
  * More info:
@@ -64,7 +64,7 @@ class WebSocketClient{
 				}
 				
 				if(this.queueLocalStorage){
-					loadQueue();
+					this.loadQueue();
 				}
 				
 				while(this.messageQueue.length > 0){
@@ -86,25 +86,25 @@ class WebSocketClient{
 				
 				this._log("Received Message:", message);
 				
-				if(this.incomingMiddleware){
-					message = this.incomingMiddleware(message);
-					this._log("Incoming Middleware return:", message);
-				}
-				
-				if(this.onMessage){
+				if(this.recordLatency && message === this.pong){
 					
-					if(this.recordLatency && message === this.pong){
-						
-						this.latencyTimestamp = Date.now();
-						this.latency = this.latencyTimestamp - this.lastPingTimestamp;
-						
-						if(this.onLatency){
-							this.onLatency(this.latency);
-						}
-						
-						this._log("Calculated latency:", this.latency);
-						
-					}else{
+					this.latencyTimestamp = Date.now();
+					this.latency = this.latencyTimestamp - this.lastPingTimestamp;
+					
+					if(this.onLatency){
+						this.onLatency(this.latency);
+					}
+					
+					this._log("Calculated latency:", this.latency);
+					
+				}else{
+					
+					if(this.incomingMiddleware){
+						message = this.incomingMiddleware(message);
+						this._log("Incoming Middleware return:", message);
+					}
+					
+					if(this.onMessage){
 						this.onMessage(message);
 					}
 					
@@ -113,6 +113,10 @@ class WebSocketClient{
 			};
 
 			this.socket.onerror = (error) => {
+				
+				if(timer){
+					clearTimeout(timer);
+				}
 				
 				if(this.onError){
 					this.onError(error);
@@ -126,6 +130,10 @@ class WebSocketClient{
 
 			this.socket.onclose = (event) => {
 				
+				if(timer){
+					clearTimeout(timer);
+				}
+				
 				if(this.onClose){
 					this.onClose(event);
 				}
@@ -133,6 +141,8 @@ class WebSocketClient{
 				this._log("Connection closed");
 				
 				this._attemptReconnect();
+				
+				reject();
 				
 			};
 			
@@ -177,7 +187,7 @@ class WebSocketClient{
 			this.messageQueue.push(message);
 			
 			if(this.queueLocalStorage){
-				saveQueue(this.messageQueue);
+				this.saveQueue(this.messageQueue);
 			}
 			
 			this._log("Websocket is not open! Putting message in queue");
@@ -247,6 +257,10 @@ class WebSocketClient{
 			clearInterval(this.keepAliveInterval);
 		}
 		
+		if(this.recordLatency){
+			return;
+		}
+		
 		this.keepAliveInterval = setInterval(() => {
 			
 			this._log("Send ping to KeepAlive");
@@ -294,13 +308,11 @@ class WebSocketClient{
 		
 	}
 	
-	trackLatency(ping, pong, interval = 10000){
+	trackLatency(interval = 10000, ping, pong){
 		
 		this._log("Starting track latency");
 		
 		this.recordLatency = true;
-		
-		this.lastPingTimestamp = Date.now();
 		
 		if(ping){
 			this.ping = ping;
@@ -312,13 +324,21 @@ class WebSocketClient{
 			this._log("Set pong name:", pong);
 		}
 		
+		this._trackLatency();
+		
 		this.pingInterval = setInterval(() => {
 			
-			this.lastPingTimestamp = Date.now();
-			this.send(this.ping);
-			this._log("Send ping to latency:", this.ping);
+			this._trackLatency();
 			
 		}, interval);
+		
+	}
+	
+	_trackLatency(){
+		
+		this.lastPingTimestamp = Date.now();
+		this.send(this.ping);
+		this._log("Send ping to latency:", this.ping);
 		
 	}
 	
@@ -369,7 +389,7 @@ class WebSocketClient{
 		
 	}
 	
-	_attemptReconnect(){
+	async _attemptReconnect(){
 		
 		if(!this._autoReconnect || this.reconnectAttemps >= this.maxReconnectAttemps){
 			return;
@@ -379,21 +399,14 @@ class WebSocketClient{
 			
 			this.connect().then(() => {
 				
-				this._log("Websocket reconnected successfully");
+				this._log("[WebSocket] Reconnected successfully");
 				
 				this.reconnectAttemps = 0;
 				
 				if(this.reconnectCallback){
 					this.reconnectCallback();
-					this._log("Reconnect callback was called");
+					this._log("[WebSocket] Reconnect callback was called");
 				}
-				
-			}).catch(() => {
-				
-				this._log("Error reconnecting Websocket");
-				
-				this.reconnectAttemps++;
-				this._attemptReconnect();
 				
 			});
 			
