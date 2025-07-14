@@ -21,7 +21,7 @@ Server.isConnected();
 Server.saveQueueOnLocalStorage(status);
 Server.startKeepAlive(interval = 15000, ping); //"ping" is the word that your server will receive as a ping if you use a word other than "ping"
 Server.stopKeepAlive();
-Server.trackLatency(ping, pong, interval = 10000); //"ping" and "pong" is the word that your server will receive as a ping if you use a word other than "ping"/"pong"
+Server.trackLatency(interval = 10000, ping, pong); //"ping" and "pong" is the word that your server will receive as a ping if you use a word other than "ping"/"pong"
 Server.untrackLatency();
 Server.getLatency();
 Server.autoReconnect(interval = 3000, maxAttemps = infinity, callback = null);
